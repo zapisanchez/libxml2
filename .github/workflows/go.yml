@@ -5,35 +5,33 @@ name: Go
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master", "upgrade"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master", "upgrade"]
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
 
-    container: 
+    container:
       image: archlinux:latest
-    
+
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set Up Arch Linux
-      run: |
-        pacman -Syy --noconfirm
-        pacman -Syu --noconfirm
-        pacman -S --noconfirm base-devel 
-        pacman -S --noconfirm libxml2
+      - name: Set Up Arch Linux
+        run: |
+          pacman -Syy --noconfirm
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm base-devel 
+          pacman -S --noconfirm libxml2
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.21'
-        
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
 
-    - name: Test
-      env:
-        GO111MODULE: off
-      run: go test parser_test.go
+      - name: Test
+        env:
+          GO111MODULE: off
+        run: go test ./...

@@ -1,9 +1,10 @@
-package libxml2
+package libxml2_test
 
 import (
 	"regexp"
 	"testing"
 
+	"github.com/lestrrat-go/libxml2"
 	"github.com/lestrrat-go/libxml2/dom"
 	"github.com/lestrrat-go/libxml2/types"
 
@@ -54,16 +55,16 @@ var (
 		stdXMLDecl,                              // only XML Declaration
 		"<!--ouch-->",                           // comment only is like an empty document
 		`<!DOCTYPE ouch [<!ENTITY foo "bar">]>`, // no good either ...
-		"<ouch>",                // single tag (tag mismatch)
-		"<ouch/>foo",            // trailing junk
-		"foo<ouch/>",            // leading junk
-		"<ouch foo=bar/>",       // bad attribute
-		`<ouch foo="bar/>`,      // bad attribute
-		"<ouch>&</ouch>",        // bad char
-		`<ouch>&//0x20;</ouch>`, // bad chart
-		"<foob<e4>r/>",          // bad encoding
-		"<ouch>&foo;</ouch>",    // undefind entity
-		"<ouch>&gt</ouch>",      // unterminated entity
+		"<ouch>",                                // single tag (tag mismatch)
+		"<ouch/>foo",                            // trailing junk
+		"foo<ouch/>",                            // leading junk
+		"<ouch foo=bar/>",                       // bad attribute
+		`<ouch foo="bar/>`,                      // bad attribute
+		"<ouch>&</ouch>",                        // bad char
+		`<ouch>&//0x20;</ouch>`,                 // bad chart
+		"<foob<e4>r/>",                          // bad encoding
+		"<ouch>&foo;</ouch>",                    // undefind entity
+		"<ouch>&gt</ouch>",                      // unterminated entity
 		stdXMLDecl + `<!DOCTYPE foobar [<!ENTITY foo "bar">]><foobar &foo;="ouch"/>`,          // bad placed entity
 		stdXMLDecl + `<!DOCTYPE foobar [<!ENTITY foo "bar=&quot;foo&quot;">]><foobar &foo;/>`, // even worse
 		"<ouch><!---></ouch>",   // bad comment
@@ -74,7 +75,7 @@ var (
 func parseShouldSucceed(t *testing.T, opts parser.Option, inputs []string) {
 	t.Logf("Test parsing with parser %v", opts)
 	for _, s := range inputs {
-		d, err := ParseString(s, opts)
+		d, err := libxml2.ParseString(s, opts)
 		if !assert.NoError(t, err, "Parse should succeed") {
 			return
 		}
@@ -84,7 +85,7 @@ func parseShouldSucceed(t *testing.T, opts parser.Option, inputs []string) {
 
 func parseShouldFail(t *testing.T, opts parser.Option, inputs []string) {
 	for _, s := range inputs {
-		d, err := ParseString(s, opts)
+		d, err := libxml2.ParseString(s, opts)
 		if err == nil {
 			d.Free()
 			t.Errorf("Expected failure to parse '%s'", s)
@@ -99,95 +100,95 @@ type ParseOptionToString struct {
 
 func TestParseOptionStringer(t *testing.T) {
 	values := []ParseOptionToString{
-		ParseOptionToString{
+		{
 			v: parser.XMLParseRecover,
 			e: "Recover",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseNoEnt,
 			e: "NoEnt",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseDTDLoad,
 			e: "DTDLoad",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseDTDAttr,
 			e: "DTDAttr",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseDTDValid,
 			e: "DTDValid",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseNoError,
 			e: "NoError",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseNoWarning,
 			e: "NoWarning",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParsePedantic,
 			e: "Pedantic",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseNoBlanks,
 			e: "NoBlanks",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseSAX1,
 			e: "SAX1",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseXInclude,
 			e: "XInclude",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseNoNet,
 			e: "NoNet",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseNoDict,
 			e: "NoDict",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseNsclean,
 			e: "Nsclean",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseNoCDATA,
 			e: "NoCDATA",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseNoXIncNode,
 			e: "NoXIncNode",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseCompact,
 			e: "Compact",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseOld10,
 			e: "Old10",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseNoBaseFix,
 			e: "NoBaseFix",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseHuge,
 			e: "Huge",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseOldSAX,
 			e: "OldSAX",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseIgnoreEnc,
 			e: "IgnoreEnc",
 		},
-		ParseOptionToString{
+		{
 			v: parser.XMLParseBigLines,
 			e: "BigLines",
 		},
@@ -201,7 +202,7 @@ func TestParseOptionStringer(t *testing.T) {
 }
 
 func TestParseEmpty(t *testing.T) {
-	doc, err := ParseString(``)
+	doc, err := libxml2.ParseString(``)
 	if err == nil {
 		t.Errorf("Parse of empty string should fail")
 		defer doc.Free()
@@ -245,7 +246,7 @@ func TestParseNoBlanks(t *testing.T) {
 }
 
 func TestRoundtripNoBlanks(t *testing.T) {
-	doc, err := ParseString(`<a>    <b/> </a>`, parser.XMLParseNoBlanks)
+	doc, err := libxml2.ParseString(`<a>    <b/> </a>`, parser.XMLParseNoBlanks)
 	if err != nil {
 		t.Errorf("failed to parse string: %s", err)
 		return
@@ -258,8 +259,8 @@ func TestRoundtripNoBlanks(t *testing.T) {
 
 func TestOptionsShouldCombine(t *testing.T) {
 	opts := map[parser.Option][]parser.Option{
-		parser.Option(64): []parser.Option{parser.XMLParseNoWarning},
-		parser.Option(96): []parser.Option{parser.XMLParseNoWarning, parser.XMLParseNoError},
+		parser.Option(64): {parser.XMLParseNoWarning},
+		parser.Option(96): {parser.XMLParseNoWarning, parser.XMLParseNoError},
 	}
 
 	for expected, options := range opts {
@@ -275,7 +276,7 @@ func TestGHIssue23(t *testing.T) {
     <goodbye>Goodbye!</goodbye>
 </rootnode>`
 
-	doc, err := ParseString(src, parser.XMLParseRecover, parser.XMLParseNoWarning, parser.XMLParseNoError)
+	doc, err := libxml2.ParseString(src, parser.XMLParseRecover, parser.XMLParseNoWarning, parser.XMLParseNoError)
 	if !assert.NoError(t, err, "should pass") {
 		return
 	}
@@ -287,7 +288,7 @@ func TestCommentWrapNodeIssue(t *testing.T) {
 	// should wrap comment node
 	const testHTML = "<p><!-- test --></p><!-- test --><p><!-- test --></p>"
 
-	doc, err := ParseHTMLString(testHTML, parser.HTMLParseRecover)
+	doc, err := libxml2.ParseHTMLString(testHTML, parser.HTMLParseRecover)
 	if err != nil {
 		t.Fatalf("Got error when parsing HTML: %v", err)
 	}
@@ -311,7 +312,7 @@ func TestPiWrapNodeIssue(t *testing.T) {
 
 	// should wrap Pi node
 	const textXML = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<a>test <?test?></a>\n"
-	doc, err := ParseString(textXML)
+	doc, err := libxml2.ParseString(textXML)
 	if err != nil {
 		t.Fatalf("Got error when parsing xml: %v", err)
 	}
@@ -336,7 +337,7 @@ func TestPiWrapNodeIssue(t *testing.T) {
 
 func TestGetNonexistentAttributeReturnsRecoverableError(t *testing.T) {
 	const src = `<?xml version="1.0"?><rootnode/>`
-	doc, err := ParseString(src)
+	doc, err := libxml2.ParseString(src)
 	if !assert.NoError(t, err, "Should parse") {
 		return
 	}

@@ -35,7 +35,7 @@ func (n *Element) SetNamespace(uri, prefix string, activate ...bool) error {
 		ns := wrapNamespaceNode(nsptr)
 		if ns.URI() != "" {
 			if activateflag {
-				clib.XMLSetNs(n, nil)
+				_ = clib.XMLSetNs(n, nil)
 			}
 		}
 		return nil

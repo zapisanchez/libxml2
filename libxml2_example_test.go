@@ -25,8 +25,8 @@ func ExampleXML() {
 	}
 	defer doc.Free()
 
-	doc.Walk(func(n types.Node) error {
-		log.Printf(n.NodeName())
+	_ = doc.Walk(func(n types.Node) error {
+		log.Println(n.NodeName())
 		return nil
 	})
 
@@ -43,7 +43,7 @@ func ExampleXML() {
 	}
 	defer ctx.Free()
 
-	ctx.RegisterNS("atom", "http://www.w3.org/2005/Atom")
+	_ = ctx.RegisterNS("atom", "http://www.w3.org/2005/Atom")
 	title := xpath.String(ctx.Find("/atom:feed/atom:title/text()"))
 	log.Printf("feed title = %s", title)
 }
@@ -60,8 +60,8 @@ func ExampleHTML() {
 	}
 	defer doc.Free()
 
-	doc.Walk(func(n types.Node) error {
-		log.Printf(n.NodeName())
+	_ = doc.Walk(func(n types.Node) error {
+		log.Println(n.NodeName())
 		return nil
 	})
 
