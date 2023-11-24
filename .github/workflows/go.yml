@@ -14,14 +14,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        arch: [x64]
+    container: 
+      image: archlinux:latest
     
     steps:
     - uses: actions/checkout@v3
 
-    - name: Configurar Arch Linux
+    - name: Set Up Arch Linux
       run: |
         sudo pacman -Syu --noconfirm
         sudo pacman -S --noconfirm base-devel 
