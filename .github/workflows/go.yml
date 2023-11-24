@@ -12,9 +12,20 @@ on:
 jobs:
 
   build:
-    runs-on: arch-latest
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        arch: [x64]
+    
     steps:
     - uses: actions/checkout@v3
+
+    - name: Configurar Arch Linux
+      run: |
+        sudo pacman -Syu --noconfirm
+        sudo pacman -S --noconfirm base-devel 
+        sudo pacman -S --noconfirm libxml2
 
     - name: Set up Go
       uses: actions/setup-go@v4
